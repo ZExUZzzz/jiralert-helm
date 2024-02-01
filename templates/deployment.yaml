@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "jiralert.fullname" . }}
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "jiralert.fullname" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "jiralert.fullname" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+        app: {{ .Values.names.deploylabel }}
+    spec:
+      containers:
+      - name: jiralert
+        image: 3ekcy3/jiralert-croc:1.0
+        imagePullPolicy: Always
+        args:
+        - "--config=/jiralert-config/jiralert.yml"
+        - "--log.level=debug"
+        - "--listen-address=:9097"
+        resources:
+          limits:
+            cpu: 250m
+            memory: 250Mi
+          requests:
+            cpu: 250m
+            memory: 250Mi
+        readinessProbe:
+          tcpSocket:
+            port: 9097
+          initialDelaySeconds: 15
+          periodSeconds: 15
+          timeoutSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 9097
+          initialDelaySeconds: 15
+          periodSeconds: 15
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 9091
+          name: metrics
+        volumeMounts:
+        - mountPath: /jiralert-config
+          name: {{ include "jiralert.fullname" . }}-config
+          readOnly: true
+      volumes:
+      - name: {{ include "jiralert.fullname" . }}-config
+        secret:
+          secretName: {{ include "jiralert.fullname" . }}-config
