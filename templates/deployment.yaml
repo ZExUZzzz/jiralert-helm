@@ -16,6 +16,8 @@ spec:
         app.kubernetes.io/instance: {{ .Release.Name }}
         app: {{ .Values.names.deploylabel }}
     spec:
+      imagePullSecrets:
+      - name: git-ist
       containers:
       - name: jiralert
         image: 3ekcy3/jiralert-croc:1.0
