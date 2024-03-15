@@ -20,7 +20,7 @@ spec:
       - name: git-ist
       containers:
       - name: jiralert
-        image: 3ekcy3/jiralert-croc:1.0
+        image: git-ist.dvslab.croc.ru:5050/gsil/jiralert:latest
         imagePullPolicy: Always
         args:
         - "--config=/jiralert-config/jiralert.yml"
